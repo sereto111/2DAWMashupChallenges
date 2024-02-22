@@ -1,0 +1,60 @@
+<html>
+<meta charset="UTF-8">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<script src="https://js.pusher.com/8.0.1/pusher.min.js"></script>
+<body>
+<canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+<script>
+    let xValues = ["Alemania", "Italia", "España", "México", "Argentina"];
+    let yValues = [55, 49, 44, 24, 15];
+    let barColors = ['rgba(99,148,255,0.2)',
+                    'rgba(70,255,64,0.2)',
+                    'rgba(255,86,111,0.2)',
+                    'rgba(218,116,33,0.2)',
+                    'rgba(231,81,218,0.2)']
+    let borderColors = ["blue", "green","red","orange","pink"];
+
+    let myChart = new Chart("myChart", {
+        type: "horizontalBar",
+        data: {
+            labels: xValues,
+            datasets: [{
+                borderWidth: 2,
+                borderColor: borderColors,
+                backgroundColor: barColors,
+                hoverBorderColor: 'rgb(213, 216, 220)',
+                hoverBackgroundColor: borderColors,
+                hoverBorderWidth: 4,
+                data: yValues
+            }]
+        },
+        options: {
+            legend: {display: false},
+            title: {
+                display: true,
+                text: "Cantidad de productos vendidos por país"
+            },
+            scales: {
+                xAxes: [{ticks: {min: 10, max:250}}]
+            }
+        }
+    });
+
+    const pusher = new Pusher(
+        "b40948aff03f4a465e37", // Replace with 'key' from dashboard
+        {
+            cluster: "eu", // Replace with 'cluster' from dashboard
+            forceTLS: true,
+        }
+    );
+    const channel = pusher.subscribe("lines");
+    channel.bind("new-lines", (datos) => {
+        for (let i = 0; i < datos.length; i++){
+            myChart.data.datasets[0].data[i] += datos[i];
+            myChart.options.scales.xAxes[0] += datos[i];
+        }
+        myChart.update();
+    });
+</script>
+</body>
+</html>
