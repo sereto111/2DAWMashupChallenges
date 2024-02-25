@@ -12,9 +12,11 @@ $pusher = new Pusher\Pusher(
 );
 // Trigger a new random event every second. In your application,
 // you should trigger the event based on real-world changes!
-for ($i = 1; $i < 10; $i++) {
+for ($i = 1; $i <= 10; $i++) {
     $pusher->trigger('lines', 'new-lines', array(
         rand(100, 200), rand(30, 130), rand(80, 120), rand(100, 200), rand(77, 177)
     ));
     sleep(1);
+    // In the domain I had to use time_nanosleep() because sleep() did not work
+    // time_nanosleep(1, 0);
 }
